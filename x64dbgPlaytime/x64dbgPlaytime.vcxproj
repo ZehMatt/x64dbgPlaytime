@@ -170,6 +170,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lua_context.cpp" />
+    <ClCompile Include="lua_debugger.cpp" />
     <ClCompile Include="lua_print.cpp" />
     <ClCompile Include="lua_registers.cpp" />
     <ClCompile Include="plugin.cpp" />

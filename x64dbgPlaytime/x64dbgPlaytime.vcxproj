@@ -22,6 +22,7 @@
     <ProjectGuid>{176822C9-3CF8-41A9-81AB-8BBD3E3E2A32}</ProjectGuid>
     <RootNamespace>x64dbgPlaytime</RootNamespace>
     <ProjectName>x64dbgPlaytime</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -48,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -169,8 +170,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lua_bootstrap.cpp" />
+    <ClCompile Include="lua_constants.cpp" />
     <ClCompile Include="lua_context.cpp" />
     <ClCompile Include="lua_debugger.cpp" />
+    <ClCompile Include="lua_modules.cpp" />
+    <ClCompile Include="lua_utils.cpp" />
+    <ClCompile Include="lua_labels.cpp" />
+    <ClCompile Include="lua_memory.cpp" />
     <ClCompile Include="lua_print.cpp" />
     <ClCompile Include="lua_registers.cpp" />
     <ClCompile Include="plugin.cpp" />

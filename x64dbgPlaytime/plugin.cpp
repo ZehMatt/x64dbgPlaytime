@@ -3,15 +3,8 @@
 
 enum
 {
-    MENU_TEST,
-    MENU_DISASM_ADLER32,
-    MENU_DUMP_ADLER32,
-    MENU_STACK_ADLER32
+    MENU_LOAD_LUA_FILE,
 };
-
-static void Adler32Menu(int hWindow)
-{
-}
 
 static bool cbLuaCommand(int argc, char* argv[])
 {
@@ -44,10 +37,6 @@ PLUG_EXPORT void CBEXCEPTION(CBTYPE cbType, PLUG_CB_EXCEPTION* info)
 
 PLUG_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, PLUG_CB_PAUSEDEBUG *info)
 {
-    if (g_pLuaContext->shouldResumeScript())
-    {
-        g_pLuaContext->resume();
-    }
 }
 
 PLUG_EXPORT void CBRESUMEDEBUG(CBTYPE cbType, PLUG_CB_RESUMEDEBUG *info)
@@ -64,32 +53,65 @@ PLUG_EXPORT void CBDEBUGEVENT(CBTYPE cbType, PLUG_CB_DEBUGEVENT* info)
     {
         dprintf("DebugEvent->EXCEPTION_DEBUG_EVENT->%.8X\n", info->DebugEvent->u.Exception.ExceptionRecord.ExceptionCode);
     }
+}
 
+void plugin_menu_load_lua_file()
+{
+    OPENFILENAMEA ofn = {};       // common dialog box structure
+    char szFile[260] = {};       // if using TCHAR macros
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = nullptr;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = "Lua\0*.lua\0All\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileName(&ofn) == TRUE)
+    {
+        g_pLuaContext->runFile(ofn.lpstrFile);
+    }
 }
 
 PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info)
 {
     switch(info->hEntry)
     {
-    case MENU_TEST:
-        MessageBoxA(hwndDlg, "Test Menu Entry Clicked!", PLUGIN_NAME, MB_ICONINFORMATION);
+    case MENU_LOAD_LUA_FILE:
+        plugin_menu_load_lua_file();
         break;
-
-    case MENU_DISASM_ADLER32:
-        Adler32Menu(GUI_DISASSEMBLY);
-        break;
-
-    case MENU_DUMP_ADLER32:
-        Adler32Menu(GUI_DUMP);
-        break;
-
-    case MENU_STACK_ADLER32:
-        Adler32Menu(GUI_STACK);
-        break;
-
     default:
         break;
     }
+}
+
+bool cbLuaExecuteScript(const char* text)
+{
+    _plugin_logprintf("> %s\n", text);
+
+    return g_pLuaContext->runString(text);
+}
+
+void cbLuaScriptComplete(const char* text, char** entries, int* entryCount)
+{
+    if(entryCount)
+        *entryCount = 0;
+}
+
+bool pluginScriptInit()
+{
+    SCRIPTTYPEINFO sti = {};
+    sti.execute = cbLuaExecuteScript;
+    sti.id = 'L' + 'u' + 'a' + '5' + '3';
+    strcpy_s(sti.name, "Playtime");
+
+    GuiRegisterScriptLanguage(&sti);
+
+    return true;
 }
 
 //Initialize your plugin data here.
@@ -120,6 +142,8 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
         _plugin_logprintf("One ore multiple scripts failed.\n");
     }
 
+    pluginScriptInit();
+
     return true; //Return false to cancel loading the plugin.
 }
 
@@ -136,8 +160,5 @@ void pluginStop()
 //Do GUI/Menu related things here.
 void pluginSetup()
 {
-    _plugin_menuaddentry(hMenu, MENU_TEST, "&Menu Test");
-    _plugin_menuaddentry(hMenuDisasm, MENU_DISASM_ADLER32, "&Adler32 Selection");
-    _plugin_menuaddentry(hMenuDump, MENU_DUMP_ADLER32, "&Adler32 Selection");
-    _plugin_menuaddentry(hMenuStack, MENU_STACK_ADLER32, "&Adler32 Selection");
+    _plugin_menuaddentry(hMenu, MENU_LOAD_LUA_FILE, "&Load Lua File");
 }

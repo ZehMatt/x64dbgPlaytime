@@ -30,6 +30,12 @@ void LuaContext::update()
 extern bool luaopen_registers(lua_State *L);
 extern bool luaopen_x64dbgprint(lua_State *L);
 extern bool luaopen_debugger(lua_State *L);
+extern bool luaopen_memory(lua_State *L);
+extern bool luaopen_x64dbg_bootstrap(lua_State *L);
+extern bool luaopen_constants(lua_State *L);
+extern bool luaopen_utils(lua_State *L);
+extern bool luaopen_labels(lua_State *L);
+extern bool luaopen_modules(lua_State *L);
 
 bool LuaContext::init()
 {
@@ -39,9 +45,15 @@ bool LuaContext::init()
     luaL_openlibs(_globalState);
 
     // x64dbg specific.
+    luaopen_constants(_globalState);
     luaopen_registers(_globalState);
     luaopen_debugger(_globalState);
+    luaopen_memory(_globalState);
+    luaopen_utils(_globalState);
+    luaopen_labels(_globalState);
+    luaopen_modules(_globalState);
     luaopen_x64dbgprint(_globalState);
+    luaopen_x64dbg_bootstrap(_globalState);
 
     return true;
 }
@@ -51,10 +63,22 @@ bool LuaContext::runString(const char *lua)
     if(!_globalState)
         return false;
 
-    initCoroutine();
+    int res = luaL_loadstring(_globalState, lua);
+    if (!processError(res, _globalState))
+    {
+        return false;
+    }
 
-    int res = luaL_loadstring(_coroutine, lua);
-    if (!processError(res, _coroutine))
+    return resume();
+}
+
+bool LuaContext::runFile(const char *file)
+{
+    if (!_globalState)
+        return false;
+
+    int res = luaL_loadfile(_globalState, file);
+    if (!processError(res, _globalState))
     {
         return false;
     }
@@ -64,24 +88,16 @@ bool LuaContext::runString(const char *lua)
 
 bool LuaContext::resume()
 {
-    initCoroutine();
-
     _scriptState = LuaScriptState::RUNNING;
-    _shouldResume = false;
 
-    int res = lua_resume(_coroutine, nullptr, 0);
-    if (!processError(res, _coroutine))
+    int res = lua_pcall(_globalState, 0, 0, 0);
+    if (!processError(res, _globalState))
     {
+        _scriptState = LuaScriptState::IDLE;
         return false;
     }
 
-    return true;
-}
-
-bool LuaContext::pause()
-{
-    dputs("Pausing script.\n");
-    _scriptState = LuaScriptState::PAUSING;
+    _scriptState = LuaScriptState::IDLE;
 
     return true;
 }

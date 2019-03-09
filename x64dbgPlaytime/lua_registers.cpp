@@ -13,66 +13,70 @@
 struct RegisterData_t
 {
     size_t offset;
-    size_t sizeInBits;
+    size_t readSize;
+    size_t writeSize;
 };
 
-#define REGISTER_RECORD(name, reg, offset, bitSize) \
-    { name, { offsetof(CONTEXT, ##reg##) + offset, bitSize} }
+#define REGISTER_RECORD(name, reg, offset, readSize, writeSize) \
+    { name, { offsetof(CONTEXT, ##reg##) + offset, readSize, writeSize} }
 
 static const std::unordered_map<std::string, RegisterData_t> RegisterOffsetMap =
 {
 #ifdef _WIN64
-    REGISTER_RECORD("rax", Rax, 0, 64),
-    REGISTER_RECORD("eax", Rax, 0, 32),
-    REGISTER_RECORD("ax", Rax, 0, 16),
-    REGISTER_RECORD("ah", Rax, 1, 8),
-    REGISTER_RECORD("al", Rax, 0, 8),
+    REGISTER_RECORD("rax", Rax, 0, 64, 64),
+    REGISTER_RECORD("eax", Rax, 0, 32, 64),
+    REGISTER_RECORD("ax", Rax, 0, 16, 16),
+    REGISTER_RECORD("ah", Rax, 1, 8, 8),
+    REGISTER_RECORD("al", Rax, 0, 8, 8),
 
-    REGISTER_RECORD("rbx", Rbx, 0, 64),
-    REGISTER_RECORD("ebx", Rbx, 0, 32),
-    REGISTER_RECORD("bx", Rbx, 0, 16),
-    REGISTER_RECORD("bh", Rbx, 1, 8),
-    REGISTER_RECORD("bl", Rbx, 0, 8),
+    REGISTER_RECORD("rbx", Rbx, 0, 64, 64),
+    REGISTER_RECORD("ebx", Rbx, 0, 32, 64),
+    REGISTER_RECORD("bx", Rbx, 0, 16, 16),
+    REGISTER_RECORD("bh", Rbx, 1, 8, 8),
+    REGISTER_RECORD("bl", Rbx, 0, 8, 8),
 
-    REGISTER_RECORD("rcx", Rcx, 0, 64),
-    REGISTER_RECORD("ecx", Rcx, 0, 32),
-    REGISTER_RECORD("cx", Rcx, 0, 16),
-    REGISTER_RECORD("ch", Rcx, 1, 8),
-    REGISTER_RECORD("cl", Rcx, 0, 8),
+    REGISTER_RECORD("rcx", Rcx, 0, 64, 64),
+    REGISTER_RECORD("ecx", Rcx, 0, 32, 64),
+    REGISTER_RECORD("cx", Rcx, 0, 16, 16),
+    REGISTER_RECORD("ch", Rcx, 1, 8, 8),
+    REGISTER_RECORD("cl", Rcx, 0, 8, 8),
 
-    REGISTER_RECORD("rdx", Rdx, 0, 64),
-    REGISTER_RECORD("edx", Rdx, 0, 32),
-    REGISTER_RECORD("dx", Rdx, 0, 16),
-    REGISTER_RECORD("dh", Rdx, 1, 8),
-    REGISTER_RECORD("dl", Rdx, 0, 8),
+    REGISTER_RECORD("rdx", Rdx, 0, 64, 64),
+    REGISTER_RECORD("edx", Rdx, 0, 32, 64),
+    REGISTER_RECORD("dx", Rdx, 0, 16, 16),
+    REGISTER_RECORD("dh", Rdx, 1, 8, 8),
+    REGISTER_RECORD("dl", Rdx, 0, 8, 8),
 
-    REGISTER_RECORD("rdi", Rdi, 0, 64),
-    REGISTER_RECORD("edi", Rdi, 0, 32),
-    REGISTER_RECORD("di", Rdi, 0, 16),
-    REGISTER_RECORD("dil", Rdi, 0, 8),
+    REGISTER_RECORD("rdi", Rdi, 0, 64, 64),
+    REGISTER_RECORD("edi", Rdi, 0, 32, 64),
+    REGISTER_RECORD("di", Rdi, 0, 16, 16),
+    REGISTER_RECORD("dil", Rdi, 0, 8, 8),
 
-    REGISTER_RECORD("rsi", Rsi, 0, 64),
-    REGISTER_RECORD("esi", Rsi, 0, 32),
-    REGISTER_RECORD("si", Rsi, 0, 16),
-    REGISTER_RECORD("sil", Rsi, 0, 8),
+    REGISTER_RECORD("rsi", Rsi, 0, 64, 64),
+    REGISTER_RECORD("esi", Rsi, 0, 32, 64),
+    REGISTER_RECORD("si", Rsi, 0, 16, 16),
+    REGISTER_RECORD("sil", Rsi, 0, 8, 8),
 
-    REGISTER_RECORD("rbp", Rbp, 0, 64),
-    REGISTER_RECORD("ebp", Rbp, 0, 32),
-    REGISTER_RECORD("bp", Rbp, 0, 16),
-    REGISTER_RECORD("bpl", Rbp, 0, 8),
+    REGISTER_RECORD("rbp", Rbp, 0, 64, 64),
+    REGISTER_RECORD("ebp", Rbp, 0, 32, 64),
+    REGISTER_RECORD("bp", Rbp, 0, 16, 16),
+    REGISTER_RECORD("bpl", Rbp, 0, 8, 8),
 
-    REGISTER_RECORD("rsp", Rsp, 0, 64),
-    REGISTER_RECORD("esp", Rsp, 0, 32),
-    REGISTER_RECORD("sp", Rsp, 0, 16),
-    REGISTER_RECORD("spl", Rsp, 0, 8),
+    REGISTER_RECORD("rsp", Rsp, 0, 64, 64),
+    REGISTER_RECORD("esp", Rsp, 0, 32, 64),
+    REGISTER_RECORD("sp", Rsp, 0, 16, 16),
+    REGISTER_RECORD("spl", Rsp, 0, 8, 8),
 
-    REGISTER_RECORD("rip", Rip, 0, 64),
-    REGISTER_RECORD("eip", Rip, 0, 32),
+    REGISTER_RECORD("rip", Rip, 0, 64, 64),
+    REGISTER_RECORD("eip", Rip, 0, 32, 64),
 
-    REGISTER_RECORD("r8", R8, 0, 64),
-    REGISTER_RECORD("r8d", R8, 0, 32),
-    REGISTER_RECORD("r8w", R8, 0, 16),
-    REGISTER_RECORD("r8b", R8, 0, 8),
+    REGISTER_RECORD("r8", R8, 0, 64, 64),
+    REGISTER_RECORD("r8d", R8, 0, 32, 64),
+    REGISTER_RECORD("r8w", R8, 0, 16, 16),
+    REGISTER_RECORD("r8b", R8, 0, 8, 8),
+
+    REGISTER_RECORD("eflags", EFlags, 0, 32, 32),
+    REGISTER_RECORD("rflags", EFlags, 0, 32, 32),
 #else
     // TODO: Implement me.
 #endif
@@ -82,7 +86,7 @@ static uint64_t readRegister(const CONTEXT& ctx, const RegisterData_t& regData)
 {
     const uint8_t *ctxBase = reinterpret_cast<const uint8_t*>(&ctx);
 
-    switch (regData.sizeInBits)
+    switch (regData.readSize)
     {
     case 64:
         return *(uint64_t*)(ctxBase + regData.offset);
@@ -101,7 +105,7 @@ static void writeRegister(CONTEXT& ctx, const RegisterData_t& regData, uint64_t 
 {
     uint8_t *ctxBase = reinterpret_cast<uint8_t*>(&ctx);
 
-    switch (regData.sizeInBits)
+    switch (regData.writeSize)
     {
     case 64:
         *(uint64_t*)(ctxBase + regData.offset) = value;
@@ -218,5 +222,6 @@ bool luaopen_registers(lua_State *L)
 {
     luaL_newlib(L, lua_registers);
     lua_setglobal(L, "registers");
+
     return true;
 }

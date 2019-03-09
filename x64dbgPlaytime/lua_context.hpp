@@ -11,8 +11,6 @@ extern LuaContext* g_pLuaContext;
 enum class LuaScriptState : uint8_t
 {
     IDLE = 0,
-    PAUSING,
-    PAUSED,
     RUNNING,
 };
 
@@ -31,10 +29,9 @@ private:
     void update();
     bool init();
     bool runString(const char *lua);
-
+    bool runFile(const char *file);
     bool executeAutorunScripts();
     bool resume();
-    bool pause();
 
     LuaScriptState getScriptState()
     {
@@ -68,5 +65,7 @@ private:
     void debugHook(lua_State *L, lua_Debug *debug);
     void panic(lua_State *L);
 };
+
+#define luaL_checktable(L,n)      (luaL_checktype(L, (n), LUA_TTABLE))
 
 #endif // LUA_CONTEXT_HPP

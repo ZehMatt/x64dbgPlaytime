@@ -22,7 +22,7 @@ int lua_print(lua_State* L)
         }
         else if (lua_isboolean(L, i))
         {
-            _plugin_logprintf("%s", lua_toboolean(L, i) == 1 ? L"true" : L"false");
+            _plugin_logprintf("%s", lua_toboolean(L, i) == 1 ? "true" : "false");
         }
         else if (lua_istable(L, i))
         {

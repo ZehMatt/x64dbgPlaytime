@@ -4,55 +4,6 @@
 #include "plugin.h"
 #include "pluginsdk/_scriptapi_module.h"
 
-/*
-SCRIPT_EXPORT bool InfoFromAddr(duint addr, ModuleInfo* info);
-SCRIPT_EXPORT bool InfoFromName(const char* name, ModuleInfo* info);
-
-SCRIPT_EXPORT duint BaseFromAddr(duint addr);
-SCRIPT_EXPORT duint BaseFromName(const char* name);
-SCRIPT_EXPORT duint SizeFromAddr(duint addr);
-SCRIPT_EXPORT duint SizeFromName(const char* name);
-
-SCRIPT_EXPORT bool NameFromAddr(duint addr, char* name); //name[MAX_MODULE_SIZE]
-SCRIPT_EXPORT bool PathFromAddr(duint addr, char* path); //path[MAX_PATH]
-SCRIPT_EXPORT bool PathFromName(const char* name, char* path); //path[MAX_PATH]
-
-SCRIPT_EXPORT duint EntryFromAddr(duint addr);
-SCRIPT_EXPORT duint EntryFromName(const char* name);
-SCRIPT_EXPORT int SectionCountFromAddr(duint addr);
-SCRIPT_EXPORT int SectionCountFromName(const char* name);
-SCRIPT_EXPORT bool SectionFromAddr(duint addr, int number, ModuleSectionInfo* section);
-SCRIPT_EXPORT bool SectionFromName(const char* name, int number, ModuleSectionInfo* section);
-SCRIPT_EXPORT bool SectionListFromAddr(duint addr, ListOf(ModuleSectionInfo) list);
-SCRIPT_EXPORT bool SectionListFromName(const char* name, ListOf(ModuleSectionInfo) list);
-SCRIPT_EXPORT bool GetMainModuleInfo(ModuleInfo* info);
-SCRIPT_EXPORT duint GetMainModuleBase();
-SCRIPT_EXPORT duint GetMainModuleSize();
-SCRIPT_EXPORT duint GetMainModuleEntry();
-SCRIPT_EXPORT int GetMainModuleSectionCount();
-SCRIPT_EXPORT bool GetMainModuleName(char* name); //name[MAX_MODULE_SIZE]
-SCRIPT_EXPORT bool GetMainModulePath(char* path); //path[MAX_PATH]
-SCRIPT_EXPORT bool GetMainModuleSectionList(ListOf(ModuleSectionInfo) list); //caller has the responsibility to free the list
-SCRIPT_EXPORT bool GetList(ListOf(ModuleInfo) list); //caller has the responsibility to free the list
-
-struct ModuleInfo
-{
-    duint base;
-    duint size;
-    duint entry;
-    int sectionCount;
-    char name[MAX_MODULE_SIZE];
-    char path[MAX_PATH];
-};
-
-struct ModuleSectionInfo
-{
-    duint addr;
-    duint size;
-    char name[MAX_SECTION_SIZE * 5];
-};
-*/
-
 static int lua_push_modulesectioninfo(lua_State *L, const Script::Module::ModuleSectionInfo& info)
 {
     lua_newtable(L);
@@ -102,6 +53,7 @@ static int lua_push_moduleinfo(lua_State *L, const Script::Module::ModuleInfo& i
     return 1;
 }
 
+/*
 static int lua_modules_getSectionList(lua_State *L)
 {
     BridgeList<Script::Module::ModuleSectionInfo> list;
@@ -121,6 +73,58 @@ static int lua_modules_getSectionList(lua_State *L)
         }
     }
 
+    return 1;
+}
+*/
+
+static int lua_modules_getMain(lua_State *L)
+{
+    const char *name = lua_tostring(L, 1);
+
+    Script::Module::ModuleInfo info = {};
+    bool res = Script::Module::GetMainModuleInfo(&info);
+    if (res)
+    {
+        lua_push_moduleinfo(L, info, true);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
+static int lua_modules_findByAddress(lua_State *L)
+{
+    lua_Integer addr = lua_tointeger(L, 1);
+
+    Script::Module::ModuleInfo info = {};
+    bool res = Script::Module::InfoFromAddr(addr, &info);
+    if (res)
+    {
+        lua_push_moduleinfo(L, info, true);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
+static int lua_modules_findByName(lua_State *L)
+{
+    const char *name = lua_tostring(L, 1);
+
+    Script::Module::ModuleInfo info = {};
+    bool res = Script::Module::InfoFromName(name, &info);
+    if (res)
+    {
+        lua_push_moduleinfo(L, info, true);
+    }
+    else
+    {
+        lua_pushnil(L);
+    }
     return 1;
 }
 
@@ -146,7 +150,9 @@ static int lua_modules_getList(lua_State *L)
 
 static const luaL_Reg lua_modules[] =
 {
-    { "getSectionList", lua_modules_getSectionList },
+    { "getMain", lua_modules_getMain },
+    { "findByAddress", lua_modules_findByAddress },
+    { "findByName", lua_modules_findByName },
     { "getList", lua_modules_getList },
     { nullptr, nullptr },
 };

@@ -75,10 +75,83 @@ static const std::unordered_map<std::string, RegisterData_t> RegisterOffsetMap =
     REGISTER_RECORD("r8w", R8, 0, 16, 16),
     REGISTER_RECORD("r8b", R8, 0, 8, 8),
 
+    REGISTER_RECORD("r9", R9, 0, 64, 64),
+    REGISTER_RECORD("r9d", R9, 0, 32, 64),
+    REGISTER_RECORD("r9w", R9, 0, 16, 16),
+    REGISTER_RECORD("r9b", R9, 0, 8, 8),
+
+    REGISTER_RECORD("r10", R10, 0, 64, 64),
+    REGISTER_RECORD("r10d", R10, 0, 32, 64),
+    REGISTER_RECORD("r10w", R10, 0, 16, 16),
+    REGISTER_RECORD("r10b", R10, 0, 8, 8),
+
+    REGISTER_RECORD("r11", R11, 0, 64, 64),
+    REGISTER_RECORD("r11d", R11, 0, 32, 64),
+    REGISTER_RECORD("r11w", R11, 0, 16, 16),
+    REGISTER_RECORD("r11b", R11, 0, 8, 8),
+
+    REGISTER_RECORD("r12", R12, 0, 64, 64),
+    REGISTER_RECORD("r12d", R12, 0, 32, 64),
+    REGISTER_RECORD("r12w", R12, 0, 16, 16),
+    REGISTER_RECORD("r12b", R12, 0, 8, 8),
+
+    REGISTER_RECORD("r13", R13, 0, 64, 64),
+    REGISTER_RECORD("r13d", R13, 0, 32, 64),
+    REGISTER_RECORD("r13w", R13, 0, 16, 16),
+    REGISTER_RECORD("r13b", R13, 0, 8, 8),
+
+    REGISTER_RECORD("r14", R14, 0, 64, 64),
+    REGISTER_RECORD("r14d", R14, 0, 32, 64),
+    REGISTER_RECORD("r14w", R14, 0, 16, 16),
+    REGISTER_RECORD("r14b", R14, 0, 8, 8),
+
+    REGISTER_RECORD("r15", R15, 0, 64, 64),
+    REGISTER_RECORD("r15d", R15, 0, 32, 64),
+    REGISTER_RECORD("r15w", R15, 0, 16, 16),
+    REGISTER_RECORD("r15b", R15, 0, 8, 8),
+
     REGISTER_RECORD("eflags", EFlags, 0, 32, 32),
     REGISTER_RECORD("rflags", EFlags, 0, 32, 32),
 #else
-    // TODO: Implement me.
+    REGISTER_RECORD("eax", Rax, 0, 32, 64),
+    REGISTER_RECORD("ax", Rax, 0, 16, 16),
+    REGISTER_RECORD("ah", Rax, 1, 8, 8),
+    REGISTER_RECORD("al", Rax, 0, 8, 8),
+
+    REGISTER_RECORD("ebx", Rbx, 0, 32, 64),
+    REGISTER_RECORD("bx", Rbx, 0, 16, 16),
+    REGISTER_RECORD("bh", Rbx, 1, 8, 8),
+    REGISTER_RECORD("bl", Rbx, 0, 8, 8),
+
+    REGISTER_RECORD("ecx", Rcx, 0, 32, 64),
+    REGISTER_RECORD("cx", Rcx, 0, 16, 16),
+    REGISTER_RECORD("ch", Rcx, 1, 8, 8),
+    REGISTER_RECORD("cl", Rcx, 0, 8, 8),
+
+    REGISTER_RECORD("edx", Rdx, 0, 32, 64),
+    REGISTER_RECORD("dx", Rdx, 0, 16, 16),
+    REGISTER_RECORD("dh", Rdx, 1, 8, 8),
+    REGISTER_RECORD("dl", Rdx, 0, 8, 8),
+
+    REGISTER_RECORD("edi", Rdi, 0, 32, 64),
+    REGISTER_RECORD("di", Rdi, 0, 16, 16),
+    REGISTER_RECORD("dil", Rdi, 0, 8, 8),
+
+    REGISTER_RECORD("esi", Rsi, 0, 32, 64),
+    REGISTER_RECORD("si", Rsi, 0, 16, 16),
+    REGISTER_RECORD("sil", Rsi, 0, 8, 8),
+
+    REGISTER_RECORD("ebp", Rbp, 0, 32, 64),
+    REGISTER_RECORD("bp", Rbp, 0, 16, 16),
+    REGISTER_RECORD("bpl", Rbp, 0, 8, 8),
+
+    REGISTER_RECORD("esp", Rsp, 0, 32, 64),
+    REGISTER_RECORD("sp", Rsp, 0, 16, 16),
+    REGISTER_RECORD("spl", Rsp, 0, 8, 8),
+
+    REGISTER_RECORD("eip", Rip, 0, 32, 64),
+
+    REGISTER_RECORD("eflags", EFlags, 0, 32, 32),
 #endif
 };
 

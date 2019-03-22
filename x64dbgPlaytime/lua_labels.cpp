@@ -24,7 +24,7 @@ static int lua_label_setname(lua_State *L)
     if(lua_isboolean(L, 3))
         manual = lua_toboolean(L, 3);
 
-    bool res = Script::Label::Set(addr, name, manual);
+    bool res = Script::Label::Set((duint)addr, name, manual);
 
     if (res)
     {
@@ -40,7 +40,7 @@ static int lua_label_getname(lua_State *L)
     lua_Integer addr = lua_tointeger(L, 1);
 
     char name[MAX_LABEL_SIZE] = {};
-    bool res = Script::Label::Get(addr, name);
+    bool res = Script::Label::Get((duint)addr, name);
     if(res)
         lua_pushstring(L, name);
     else
@@ -67,7 +67,7 @@ static int lua_label_getinfo(lua_State *L)
     lua_Integer addr = lua_tointeger(L, 1);
 
     Script::Label::LabelInfo info = {};
-    bool res = Script::Label::GetInfo(addr, &info);
+    bool res = Script::Label::GetInfo((duint)addr, &info);
     if (res)
     {
         lua_push_labelinfo(L, info);
@@ -87,12 +87,12 @@ static int lua_label_remove(lua_State *L)
     if (lua_isinteger(L, 2))
     {
         lua_Integer addrEnd = lua_tointeger(L, 2);
-        Script::Label::DeleteRange(addr, addrEnd);
+        Script::Label::DeleteRange((duint)addr, (duint)addrEnd);
         res = true; // Hmm
     }
     else
     {
-        res = Script::Label::Delete(addr);
+        res = Script::Label::Delete((duint)addr);
     }
 
     if (res)

@@ -99,7 +99,7 @@ static int lua_modules_findByAddress(lua_State *L)
     lua_Integer addr = lua_tointeger(L, 1);
 
     Script::Module::ModuleInfo info = {};
-    bool res = Script::Module::InfoFromAddr(addr, &info);
+    bool res = Script::Module::InfoFromAddr((duint)addr, &info);
     if (res)
     {
         lua_push_moduleinfo(L, info, true);

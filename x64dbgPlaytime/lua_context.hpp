@@ -3,6 +3,7 @@
 
 #include "lua.hpp"
 #include <stdint.h>
+#include <string>
 
 class LuaContext;
 
@@ -21,12 +22,14 @@ private:
     lua_State* _coroutine;
     LuaScriptState _scriptState;
     bool _shouldResume;
+    std::string _basePath;
 
  public:
     LuaContext();
     ~LuaContext();
 
     void update();
+    void setLuaBasePath(const char* path);
     bool init();
     bool runString(const char *lua);
     bool runFile(const char *file);

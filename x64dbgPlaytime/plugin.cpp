@@ -1,5 +1,6 @@
 #include "plugin.h"
 #include "lua_context.hpp"
+#include <windows.h>
 
 enum
 {

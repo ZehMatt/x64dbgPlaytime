@@ -10,3 +10,5 @@
 bool pluginInit(PLUG_INITSTRUCT* initStruct);
 void pluginStop();
 void pluginSetup();
+
+void getX64DbgBasePath(char *buffer, size_t len);

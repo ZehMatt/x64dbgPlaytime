@@ -11,10 +11,10 @@ static int lua_memory_read(lua_State *L)
     lua_Integer addr = lua_tointeger(L, 1);
     lua_Integer len = lua_tointeger(L, 2);
 
-    std::unique_ptr<uint8_t[]> buf(new uint8_t[len]);
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[(size_t)len]);
 
     duint dataRead = 0;
-    if (!Script::Memory::Read(addr, buf.get(), len, &dataRead))
+    if (!Script::Memory::Read(addr, buf.get(), (duint)len, &dataRead))
     {
         lua_pushnil(L);
         lua_pushinteger(L, 0);
@@ -35,7 +35,7 @@ static int lua_memory_write(lua_State *L)
     const char *buf = luaL_tolstring(L, 2, &dataSize);
 
     duint dataWritten = 0;
-    if (!Script::Memory::Write(addr, buf, dataSize, &dataWritten))
+    if (!Script::Memory::Write((duint)addr, buf, dataSize, &dataWritten))
     {
         lua_pushinteger(L, 0);
     }
@@ -56,7 +56,7 @@ static int TypePtrMeta_Index(lua_State *L)
     T res = 0;
 
     duint dataRead = 0;
-    if (!Script::Memory::Read(addr, &res, sizeof(T), &dataRead) || dataRead != sizeof(T))
+    if (!Script::Memory::Read((duint)addr, &res, sizeof(T), &dataRead) || dataRead != sizeof(T))
     {
         lua_pushnil(L);
     }
@@ -79,7 +79,7 @@ static int TypePtrMeta_NewIndex(lua_State *L)
     T ulValue = static_cast<T>(val);
 
     duint dataWritten = 0;
-    if (!Script::Memory::Write(addr, &ulValue, sizeof(T), &dataWritten) || dataWritten != sizeof(T))
+    if (!Script::Memory::Write((duint)addr, &ulValue, sizeof(T), &dataWritten) || dataWritten != sizeof(T))
     {
         // HMM
     }

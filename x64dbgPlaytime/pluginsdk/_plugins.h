@@ -68,7 +68,7 @@ typedef struct
 typedef struct
 {
     CREATE_PROCESS_DEBUG_INFO* CreateProcessInfo;
-    IMAGEHLP_MODULE64* modInfo;
+    void* modInfo;
     const char* DebugFileName;
     PROCESS_INFORMATION* fdProcessInfo;
 } PLUG_CB_CREATEPROCESS;
@@ -98,7 +98,7 @@ typedef struct
 typedef struct
 {
     LOAD_DLL_DEBUG_INFO* LoadDll;
-    IMAGEHLP_MODULE64* modInfo;
+    void* modInfo;
     const char* modname;
 } PLUG_CB_LOADDLL;
 

@@ -10,8 +10,6 @@ LuaContext::LuaContext()
     _scriptState(LuaScriptState::IDLE),
     _shouldResume(false)
 {
-    _globalState = luaL_newstate();
-    //lua_sethook(_globalState, LuaContext::luaDebugCallback, LUA_MASKCALL | LUA_MASKCOUNT | LUA_MASKLINE| LUA_MASKRET, 0);
 }
 
 LuaContext::~LuaContext()
@@ -25,6 +23,11 @@ LuaContext::~LuaContext()
 
 void LuaContext::update()
 {
+}
+
+void LuaContext::setLuaBasePath(const char* path)
+{
+    _basePath = path;
 }
 
 extern bool luaopen_registers(lua_State *L);
@@ -41,6 +44,12 @@ extern bool luaopen_bps(lua_State *L);
 
 bool LuaContext::init()
 {
+    if(_globalState != nullptr)
+        return false;
+
+    _globalState = luaL_newstate();
+    //lua_sethook(_globalState, LuaContext::luaDebugCallback, LUA_MASKCALL | LUA_MASKCOUNT | LUA_MASKLINE| LUA_MASKRET, 0);
+
     if(!_globalState)
         return false;
 

@@ -36,6 +36,7 @@ extern bool luaopen_constants(lua_State *L);
 extern bool luaopen_utils(lua_State *L);
 extern bool luaopen_labels(lua_State *L);
 extern bool luaopen_modules(lua_State *L);
+extern bool luaopen_xrefs(lua_State *L);
 
 bool LuaContext::init()
 {
@@ -54,6 +55,7 @@ bool LuaContext::init()
     luaopen_modules(_globalState);
     luaopen_x64dbgprint(_globalState);
     luaopen_x64dbg_bootstrap(_globalState);
+    luaopen_xrefs(_globalState);
 
     return true;
 }

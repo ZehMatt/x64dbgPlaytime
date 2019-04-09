@@ -7,6 +7,38 @@
 
 namespace Utils {
 
+std::vector<DirectoryEntry_t> readDirectory(const std::string& path, const std::string& searchPattern)
+{
+    std::vector<DirectoryEntry_t> res;
+
+    std::string search = pathCombine(path, searchPattern);
+
+    WIN32_FIND_DATAA fd = {};
+
+    HANDLE hFind = FindFirstFileA(search.c_str(), &fd);
+    if(hFind == nullptr)
+        return res;
+
+    do 
+    {
+        if(fd.cFileName[0] == '.' && fd.cFileName[1] == '\0')
+            continue;
+        if (fd.cFileName[0] == '.' && fd.cFileName[1] == '.' && fd.cFileName[2] == '\0')
+            continue;
+
+        DirectoryEntry_t entry;
+        entry.filePath = pathCombine(path, fd.cFileName);
+        entry.isDirectory = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+        res.emplace_back(std::move(entry));
+
+    } while (FindNextFileA(hFind, &fd) != FALSE);
+
+    FindClose(hFind);
+
+    return res;
+}
+
 std::string pathCombine(const std::string& path, const std::string& add)
 {
     std::string res = path;

@@ -25,7 +25,7 @@ void LuaContext::update()
 {
 }
 
-void LuaContext::setLuaBasePath(const char* path)
+void LuaContext::setLuaBasePath(const std::string& path)
 {
     _basePath = path;
 }

@@ -1,6 +1,6 @@
 #include "plugin.h"
 #include "lua_context.hpp"
-#include <windows.h>
+#include "utils.h"
 
 enum
 {
@@ -126,7 +126,15 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
         return false;
     }
 
+    std::string basePath = Utils::getBasePath();
+    _plugin_logprintf("Base Path: %s\n", basePath.c_str());
+
+    std::string luaBasePath = Utils::pathCombine(basePath, "lua");
+    _plugin_logprintf("Lua Base Path: %s\n", luaBasePath.c_str());
+
     g_pLuaContext = new LuaContext();
+    g_pLuaContext->setLuaBasePath(luaBasePath);
+
     _plugin_logprintf("Lua context created\n");
 
     if (!g_pLuaContext->init())

@@ -29,7 +29,7 @@ private:
     ~LuaContext();
 
     void update();
-    void setLuaBasePath(const char* path);
+    void setLuaBasePath(const std::string& path);
     bool init();
     bool runString(const char *lua);
     bool runFile(const char *file);

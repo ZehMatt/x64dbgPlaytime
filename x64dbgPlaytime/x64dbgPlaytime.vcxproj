@@ -180,6 +180,7 @@
     <ClCompile Include="lua_memory.cpp" />
     <ClCompile Include="lua_print.cpp" />
     <ClCompile Include="lua_registers.cpp" />
+    <ClCompile Include="lua_xrefs.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="pluginmain.cpp" />
   </ItemGroup>

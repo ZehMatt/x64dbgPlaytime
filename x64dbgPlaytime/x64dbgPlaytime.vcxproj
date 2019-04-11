@@ -171,6 +171,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lua_bootstrap.cpp" />
+    <ClCompile Include="lua_bps.cpp" />
     <ClCompile Include="lua_constants.cpp" />
     <ClCompile Include="lua_context.cpp" />
     <ClCompile Include="lua_debugger.cpp" />

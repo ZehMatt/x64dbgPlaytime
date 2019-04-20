@@ -11,7 +11,7 @@ static bool cbLuaCommand(int argc, char* argv[])
 {
     const char *luaCode = argv[0] + 4;
 
-    _plugin_logprintf("> %s\n", luaCode);
+    dprintf("> %s\n", luaCode);
 
     return g_pLuaContext->runString(luaCode);
 }
@@ -94,7 +94,7 @@ PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info)
 
 bool cbLuaExecuteScript(const char* text)
 {
-    _plugin_logprintf("> %s\n", text);
+    dprintf("> %s\n", text);
 
     return g_pLuaContext->runString(text);
 }
@@ -129,33 +129,33 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
     }
 
     std::string basePath = Utils::getx64DbgBasePath();
-    _plugin_logprintf("Base Path: %s\n", basePath.c_str());
+    dprintf("Base Path: %s\n", basePath.c_str());
 
     std::string luaBasePath = Utils::pathCombine(basePath, "lua");
-    _plugin_logprintf("Lua Base Path: %s\n", luaBasePath.c_str());
+    dprintf("Lua Base Path: %s\n", luaBasePath.c_str());
 
     g_pLuaContext = new LuaContext();
     g_pLuaContext->setBasePath(luaBasePath);
 
-    _plugin_logprintf("Lua context created\n");
+    dprintf("Lua context created\n");
 
     if (!g_pLuaContext->createGlobalState())
     {
-        _plugin_logprintf("Unable to register lua libraries.\n");
+        dprintf("Unable to register lua libraries.\n");
     }
     else
     {
-        _plugin_logprintf("Registered lua libraries.\n");
+        dprintf("Registered lua libraries.\n");
     }
 
     if (!g_pLuaContext->loadCoreScripts())
     {
-        _plugin_logprintf("Unable to load core scripts, lua scripts may not function properly.\n");
+        dprintf("Unable to load core scripts, lua scripts may not function properly.\n");
     }
 
     if (!g_pLuaContext->executeAutorunScripts())
     {
-        _plugin_logprintf("One ore multiple scripts failed.\n");
+        dprintf("One ore multiple scripts failed.\n");
     }
 
     pluginScriptInit();

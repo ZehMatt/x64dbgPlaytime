@@ -222,7 +222,7 @@ static int lua_register_read(lua_State *L)
         if (GetThreadContext(hThread, &ctx) == FALSE)
         {
             DWORD lastError = GetLastError();
-            _plugin_logprintf("ERROR: Unable to get thread context: %08X\n", lastError);
+            dprintf("ERROR: Unable to get thread context: %08X\n", lastError);
             return 0;
         }
 
@@ -261,7 +261,7 @@ static int lua_register_write(lua_State *L)
         if (GetThreadContext(hThread, &ctx) == FALSE)
         {
             DWORD lastError = GetLastError();
-            _plugin_logprintf("ERROR: Unable to get thread context: %08X\n", lastError);
+            dprintf("ERROR: Unable to get thread context: %08X\n", lastError);
             return 0;
         }
 
@@ -272,7 +272,7 @@ static int lua_register_write(lua_State *L)
             if (SetThreadContext(hThread, &ctx) == FALSE)
             {
                 DWORD lastError = GetLastError();
-                _plugin_logprintf("ERROR: Unable to set thread context: %08X\n", lastError);
+                dprintf("ERROR: Unable to set thread context: %08X\n", lastError);
                 return 0;
             }
 

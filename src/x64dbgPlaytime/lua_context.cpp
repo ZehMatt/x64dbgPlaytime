@@ -128,7 +128,7 @@ bool LuaContext::runFile(const char *file, bool registerAutoupdate /* = false*/)
 
     if (!Utils::readFileContents(file, "rt", scriptData))
     {
-        _plugin_logprintf("Unable to open file: %s\n", file);
+        dprintf("Unable to open file: %s\n", file);
         return false;
     }
 
@@ -227,7 +227,7 @@ bool LuaContext::processError(int res, lua_State *L)
         const char *pszError = lua_tostring(L, -1);
         if (pszError)
         {
-            _plugin_logprintf("Lua Error: %s\n", pszError);
+            dprintf("Lua Error: %s\n", pszError);
         }
 
         if (L == _coroutine)
@@ -263,7 +263,7 @@ void LuaContext::panic(lua_State *L)
     const char* pszError = lua_tostring(L, 1);
     if (pszError)
     {
-        _plugin_logprintf("Lua Panic: %s\n", pszError);
+        dprintf("Lua Panic: %s\n", pszError);
     }
 }
 

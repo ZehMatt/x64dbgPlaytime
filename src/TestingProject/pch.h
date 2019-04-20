@@ -9,6 +9,12 @@
 #ifndef PCH_H
 #define PCH_H
 
-// TODO: add headers that you want to pre-compile here
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include <iostream>
+#include <varargs.h>
+#include <stdint.h>
+#include <intrin.h>
 
 #endif //PCH_H

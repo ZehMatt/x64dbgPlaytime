@@ -175,6 +175,7 @@
     <ClCompile Include="lua_constants.cpp" />
     <ClCompile Include="lua_context.cpp" />
     <ClCompile Include="lua_debugger.cpp" />
+    <ClCompile Include="lua_globals.cpp" />
     <ClCompile Include="lua_modules.cpp" />
     <ClCompile Include="lua_utils.cpp" />
     <ClCompile Include="lua_labels.cpp" />
@@ -188,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lua_context.hpp" />
+    <ClInclude Include="lua_table_utils.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="pluginmain.h" />
     <ClInclude Include="pluginsdk\bridgegraph.h" />

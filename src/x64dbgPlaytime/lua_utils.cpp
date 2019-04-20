@@ -32,7 +32,7 @@ static const luaL_Reg lua_utils[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_utils(lua_State *L)
+bool luaopen_utils(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_utils);
     lua_setglobal(L, "utils");

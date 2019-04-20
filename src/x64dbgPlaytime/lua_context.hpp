@@ -2,8 +2,10 @@
 #define LUA_CONTEXT_HPP
 
 #include "lua.hpp"
+
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 class LuaContext;
 
@@ -13,6 +15,12 @@ enum class LuaScriptState : uint8_t
 {
     IDLE = 0,
     RUNNING,
+};
+
+struct LuaDebugState
+{
+    uint32_t processId;
+    lua_State *L;
 };
 
 class LuaContext
@@ -29,12 +37,22 @@ private:
     ~LuaContext();
 
     void update();
-    void setLuaBasePath(const std::string& path);
-    bool init();
-    bool runString(const char *lua);
-    bool runFile(const char *file);
+    void setBasePath(const std::string& path);
+    const std::string& getBasePath() const;
+
+    bool openLibraries(bool debugState);
+    bool loadCoreScripts();
+
+    bool createGlobalState();
+    bool shutdownGlobalState();
+
+    bool createDebugState(uint32_t processId);
+    bool shutdownDebugState(uint32_t processId);
+
+    bool runFile(const char *file, bool registerAutoupdate = false);
+    bool runString(const char *lua, const char *path = "", const char *scriptName = "RUNSTRING");
     bool executeAutorunScripts();
-    bool resume();
+    bool protectedLuaCall(int numParams = 0, int numReturns = 0);
 
     LuaScriptState getScriptState()
     {

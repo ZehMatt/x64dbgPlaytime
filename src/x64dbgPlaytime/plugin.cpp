@@ -24,11 +24,13 @@ static duint exprZero(int argc, duint* argv, void* userdata)
 PLUG_EXPORT void CBINITDEBUG(CBTYPE cbType, PLUG_CB_INITDEBUG* info)
 {
     dprintf("Debugging of %s started!\n", info->szFileName);
+    g_pLuaContext->createDebugState(0);
 }
 
 PLUG_EXPORT void CBSTOPDEBUG(CBTYPE cbType, PLUG_CB_STOPDEBUG* info)
 {
     dputs("Debugging stopped!");
+    g_pLuaContext->shutdownDebugState(0);
 }
 
 PLUG_EXPORT void CBEXCEPTION(CBTYPE cbType, PLUG_CB_EXCEPTION* info)
@@ -74,7 +76,7 @@ void plugin_menu_load_lua_file()
 
     if (GetOpenFileName(&ofn) == TRUE)
     {
-        g_pLuaContext->runFile(ofn.lpstrFile);
+        g_pLuaContext->runString(ofn.lpstrFile);
     }
 }
 
@@ -126,18 +128,18 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
         return false;
     }
 
-    std::string basePath = Utils::getBasePath();
+    std::string basePath = Utils::getx64DbgBasePath();
     _plugin_logprintf("Base Path: %s\n", basePath.c_str());
 
     std::string luaBasePath = Utils::pathCombine(basePath, "lua");
     _plugin_logprintf("Lua Base Path: %s\n", luaBasePath.c_str());
 
     g_pLuaContext = new LuaContext();
-    g_pLuaContext->setLuaBasePath(luaBasePath);
+    g_pLuaContext->setBasePath(luaBasePath);
 
     _plugin_logprintf("Lua context created\n");
 
-    if (!g_pLuaContext->init())
+    if (!g_pLuaContext->createGlobalState())
     {
         _plugin_logprintf("Unable to register lua libraries.\n");
     }
@@ -146,7 +148,12 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
         _plugin_logprintf("Registered lua libraries.\n");
     }
 
-    if (g_pLuaContext->executeAutorunScripts())
+    if (!g_pLuaContext->loadCoreScripts())
+    {
+        _plugin_logprintf("Unable to load core scripts, lua scripts may not function properly.\n");
+    }
+
+    if (!g_pLuaContext->executeAutorunScripts())
     {
         _plugin_logprintf("One ore multiple scripts failed.\n");
     }
@@ -161,6 +168,8 @@ void pluginStop()
 {
     if (g_pLuaContext)
     {
+        dprintf("Shutting down lua environment");
+
         delete g_pLuaContext;
         g_pLuaContext = nullptr;
     }

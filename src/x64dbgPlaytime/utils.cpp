@@ -7,6 +7,31 @@
 
 namespace Utils {
 
+bool readFileContents(const char *file, const char *mode, std::vector<uint8_t>& data)
+{
+    uint8_t tempBuffer[2048];
+
+    FILE* fp = nullptr;
+    fopen_s(&fp, file, mode);
+    if(fp == nullptr)
+        return false;
+
+    // Clears buffer, we don't extend existing ones.
+    data.clear();
+
+    while (!feof(fp))
+    {
+        int bytesRead = fread(tempBuffer, 1, sizeof(tempBuffer), fp);
+        if (bytesRead > 0)
+        {
+            data.insert(data.end(), &tempBuffer[0], &tempBuffer[bytesRead]);
+        }
+    }
+
+    fclose(fp);
+    return true;
+}
+
 std::vector<DirectoryEntry_t> readDirectory(const std::string& path, const std::string& searchPattern)
 {
     std::vector<DirectoryEntry_t> res;
@@ -27,7 +52,9 @@ std::vector<DirectoryEntry_t> readDirectory(const std::string& path, const std::
             continue;
 
         DirectoryEntry_t entry;
-        entry.filePath = pathCombine(path, fd.cFileName);
+        entry.fileName = fd.cFileName;
+        entry.basePath = path;
+        entry.fullFilePath = pathCombine(path, fd.cFileName);
         entry.isDirectory = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
         res.emplace_back(std::move(entry));
@@ -87,7 +114,23 @@ std::string canonicalizePath(const std::string& path)
     return tempBuffer;
 }
 
-std::string getBasePath()
+
+std::string escapeQuotes(const std::string& val)
+{
+    std::string res = val;
+    for (auto it = res.begin(); it != res.end();)
+    {
+        if (*it == '"')
+        {
+            it = res.insert(it, '\\');
+            it++;
+        }
+        it++;
+    }
+    return res;
+}
+
+std::string getx64DbgBasePath()
 {
     char tempBuffer[1024] = {};
 

@@ -10,7 +10,13 @@ static void define_constant(lua_State *L, const char *name, lua_Integer val)
     lua_setglobal(L, name);
 }
 
-bool luaopen_constants(lua_State *L)
+static void define_constant_bool(lua_State *L, const char *name, bool val)
+{
+    lua_pushboolean(L, val);
+    lua_setglobal(L, name);
+}
+
+bool luaopen_constants(lua_State *L, bool debugState)
 {
     // Flags
     define_constant(L, "EFL_C", 1 << 0);
@@ -22,6 +28,8 @@ bool luaopen_constants(lua_State *L)
     define_constant(L, "EFL_I", 1 << 9);
     define_constant(L, "EFL_D", 1 << 10);
     define_constant(L, "EFL_O", 1 << 11);
+
+    define_constant_bool(L, "IS_DEBUGGING", debugState);
 
     return true;
 }

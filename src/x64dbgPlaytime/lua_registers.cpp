@@ -291,7 +291,7 @@ static const luaL_Reg lua_registers[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_registers(lua_State *L)
+bool luaopen_registers(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_registers);
     lua_setglobal(L, "registers");

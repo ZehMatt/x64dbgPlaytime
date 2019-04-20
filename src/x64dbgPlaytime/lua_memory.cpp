@@ -97,7 +97,7 @@ static const luaL_Reg lua_memory[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_memory(lua_State *L)
+bool luaopen_memory(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_memory);
     lua_setglobal(L, "memory");

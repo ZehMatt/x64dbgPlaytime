@@ -43,7 +43,7 @@ static const luaL_Reg lua_bps[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_bps(lua_State *L)
+bool luaopen_bps(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_bps);
     lua_setglobal(L, "bps");

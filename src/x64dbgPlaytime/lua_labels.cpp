@@ -134,7 +134,7 @@ static const luaL_Reg lua_labels[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_labels(lua_State *L)
+bool luaopen_labels(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_labels);
     lua_setglobal(L, "labels");

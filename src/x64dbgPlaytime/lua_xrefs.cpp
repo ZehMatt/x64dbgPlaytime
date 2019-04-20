@@ -85,7 +85,7 @@ static const luaL_Reg lua_xrefs[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_xrefs(lua_State *L)
+bool luaopen_xrefs(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_xrefs);
     lua_setglobal(L, "xrefs");

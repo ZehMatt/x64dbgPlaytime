@@ -157,7 +157,7 @@ static const luaL_Reg lua_modules[] =
     { nullptr, nullptr },
 };
 
-bool luaopen_modules(lua_State *L)
+bool luaopen_modules(lua_State *L, bool debugState)
 {
     luaL_newlib(L, lua_modules);
     lua_setglobal(L, "modules");

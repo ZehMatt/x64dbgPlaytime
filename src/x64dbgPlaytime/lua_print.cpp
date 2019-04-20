@@ -42,7 +42,7 @@ int lua_print(lua_State* L)
     return 0;
 }
 
-bool luaopen_x64dbgprint(lua_State *L)
+bool luaopen_x64dbgprint(lua_State *L, bool debugState)
 {
     lua_getglobal(L, "_G");
 

@@ -1,7 +1,9 @@
 #include "lua_context.hpp"
 #include "lauxlib.h"
+#include "lua_table_utils.h"
 #include "pluginsdk/bridgemain.h"
 #include "plugin.h"
+#include "utils.h"
 
 #include <windows.h>
 #include <unordered_map>
@@ -71,6 +73,54 @@ static int lua_debugger_switchThread(lua_State *L)
     return 1;
 }
 
+static int lua_debugger_start(lua_State *L)
+{
+    if (lua_istable(L, 1) == false)
+    {
+        luaL_error(L, "Table expected for paramter 1");
+    }
+
+    lua_pushvalue(L, 1);
+    std::string executable = lua_table_getfield_string(L, "executable");
+    std::string arguments = lua_table_haskey(L, "arguments") ? lua_table_getfield_string(L, "arguments") : "";
+    std::string directory = lua_table_haskey(L, "directory") ? lua_table_getfield_string(L, "directory") : "";
+    bool waitForPause = lua_table_haskey(L, "wait") ? lua_table_getfield_boolean(L, "wait") : false;
+    lua_pop(L, 1);
+
+    std::string cmd = "InitDebug \"" + executable + "\"";
+    if (arguments.empty() == false)
+    {
+        cmd += ",\"" + Utils::escapeQuotes(arguments) + "\"";
+    }
+    if (directory.empty() == false)
+    {
+        cmd += ",\"" + directory + "\"";
+    }
+
+    bool res = DbgCmdExec(cmd.c_str());
+
+    if (res && waitForPause)
+        _plugin_waituntilpaused();
+
+    lua_pushboolean(L, res);
+
+    return 1;
+}
+
+static int lua_debugger_stop(lua_State *L)
+{
+    bool res = DbgCmdExecDirect("stop");
+    lua_pushboolean(L, res);
+
+    return 1;
+}
+
+static const luaL_Reg lua_debugger_global[] =
+{
+    { "start", lua_debugger_start },
+    { nullptr, nullptr },
+};
+
 static const luaL_Reg lua_debugger[] =
 {
     { "stepOver", lua_debugger_stepOver },
@@ -79,12 +129,16 @@ static const luaL_Reg lua_debugger[] =
     { "wait", lua_debugger_wait },
     { "isRunning", lua_debugger_isRunning },
     { "switchThread", lua_debugger_switchThread },
+    { "stop", lua_debugger_stop },
     { nullptr, nullptr },
 };
 
-bool luaopen_debugger(lua_State *L)
+bool luaopen_debugger(lua_State *L, bool debugState)
 {
-    luaL_newlib(L, lua_debugger);
+    if(debugState)
+        luaL_newlib(L, lua_debugger);
+    else
+        luaL_newlib(L, lua_debugger_global);
     lua_setglobal(L, "debugger");
     return true;
 }

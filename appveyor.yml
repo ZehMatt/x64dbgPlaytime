@@ -1,0 +1,9 @@
+version: 0.1.{build}
+image: Visual Studio 2017
+configuration: Release
+platform: x86-x64
+build_script:
+- cmd: .\build-release.bat
+artifacts:
+- path: build
+  name: build-rel-0-1-%APPVEYOR_BUILD_NUMBER%-x86x64

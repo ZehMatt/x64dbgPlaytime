@@ -1,7 +1,8 @@
 assembler.OP_REGISTER = 1
-assembler.OP_MEMORY = 2
-assembler.OP_LABEL = 3
+assembler.OP_MEMORYREF = 2
+assembler.OP_MEMORY = 3
 assembler.OP_IMM = 4
+assembler.OP_LABEL = 5
 
 assembler.OBJECT_INSTRUCTION = 1
 assembler.OBJECT_LABEL = 2

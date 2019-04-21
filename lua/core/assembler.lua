@@ -1,7 +1,91 @@
 include("assembler_defs.lua")
 
+local function makeMemoryReference()
+
+	local REF_META = {}
+	REF_META.__index = REF_META
+	function REF_META:clone()
+		local res = { base = self.base, index = self.index, scale = self.scale, disp32 = self.disp32, label = self.label }
+		setmetatable(res, REF_META)
+		return res
+	end
+	function REF_META:__add(other)
+		print(self, "REF_META:ADD", other)
+		if type(other) == "number" then
+			local res = self:clone()
+			res.disp32 = other + (res.disp32 or 0)
+			return res
+		elseif type(other) == "table" and other.object == assembler.OP_REGISTER then
+			local res = self:clone()
+			if res.base ~= nil and res.index == nil then
+				res.index = other
+			elseif res.index ~= nil and res.base == nil then
+				res.base = other
+			elseif res.index ~= nil and res.base ~= nil then
+				error("complex expression: can only have two registers for memory reference")
+			end
+			return res
+		elseif type(other) == "table" and other.object == assembler.OP_LABEL then
+			local res = self:clone()
+			if res.label ~= nil then
+				error("complex expression: only one label is currently supported")
+			end
+			res.label = other
+			return res
+		else
+			error("unsupported reference model")
+		end
+	end
+	function REF_META:__mul(other)
+		print(self, "REF_META:MUL", other)
+		if type(other) == "number" then
+			local res = self:clone()
+			res.scale = other
+			if res.base ~= nil and res.index == nil then
+				res.index = res.base
+				res.base = nil
+			end
+			return res
+		end
+	end
+	local ref = { object = assembler.OP_MEMORYREF }
+	setmetatable(ref, REF_META)
+	return ref
+end
+
 local function makeOperandRegister(name, id, size)
-	return { object = assembler.OP_REGISTER, name = name, id = id, size = size }
+	local REG_META = {}
+	REG_META.__index = REG_META
+	function REG_META:__add(other)
+		print(self, "REG_META:ADD", other)
+		local res = makeMemoryReference()
+		if type(other) == "number" then
+			res.base = self
+			res.disp32 = other
+		elseif type(other) == "table" and other.object == assembler.OP_REGISTER then
+			res.base = self
+			res.index = other
+		else
+			error("complex expression: unsupported expression")
+			res = nil
+		end
+		return res
+	end
+	function REG_META:__mul(other)
+		print(self, "REG_META:MUL", other)
+		local res = makeMemoryReference()
+		if type(other) == "number" then
+			res.index = self
+			res.scale = other
+		else
+			error("complex expression: unsupported expression")
+			res = nil
+		end
+		return res
+	end
+	local res = { object = assembler.OP_REGISTER, name = name, id = id, size = size }
+	setmetatable(res, REG_META)
+	return res
 end
 
 local function makeOperandImm(imm)
@@ -12,8 +96,8 @@ local function makeOperandLabel(id)
 	return { object = assembler.OP_LABEL, id = id }
 end
 
-local function makeOperandMemory(size, regBase, regIndex, disp32, scale, labelId)
-	return { object = assembler.OP_MEMORY, size = size, base = regBase, index = regIndex, disp32 = disp32, scale = scale, labelId = labelId }
+local function makeOperandMemory(size, ref)
+	return { object = assembler.OP_MEMORY, size = size, ref = ref }
 end
 
 local function splitString(s, delimiter)
@@ -42,6 +126,64 @@ local function initInstructions(a)
 			end
 		end
 	end
+end
+
+local function fixupOperand(op)
+	if op ~= nil and type(op) == "number" then
+		op = makeOperandImm(op)
+	end
+	return op
+end
+
+local function initMemoryOperands(a)
+
+	local function getMemoryReference(arg)
+		local ref 
+		if type(arg) == "table" and arg.object == assembler.OP_MEMORYREF then
+			ref = arg
+		elseif type(arg) == "table" and arg.object == assembler.OP_REGISTER then
+			print("reference from register")
+			ref = makeMemoryReference()
+			ref.base = arg
+		elseif type(arg) == "table" and arg.object == assembler.OP_LABEL then
+			print("reference from label")
+			ref = makeMemoryReference()
+			ref.label = arg
+		elseif type(arg) == "number" then
+			ref = makeMemoryReference()
+			ref.disp32 = arg
+		else
+			error("unsupported argument")
+		end
+		assert(ref ~= nil)
+		return ref
+	end
+	
+	a.byte_ptr = function(arg)
+		local ref = getMemoryReference(arg)
+		local res = makeOperandMemory(8, ref)
+		assert(res.ref ~= nil)
+		return res
+	end
+	a.word_ptr = function(arg)
+		local ref = getMemoryReference(arg)
+		local res =  makeOperandMemory(16, ref)
+		assert(res.ref ~= nil)
+		return res
+	end
+	a.dword_ptr = function(arg)
+		local ref = getMemoryReference(arg)
+		local res =  makeOperandMemory(32, ref)
+		assert(res.ref ~= nil)
+		return res
+	end
+	a.qword_ptr = function(arg)
+		local ref = getMemoryReference(arg)
+		local res = makeOperandMemory(64, ref)
+		assert(res.ref ~= nil)
+		return res
+	end
+	
 end
 
 local function initRegisters(a)
@@ -136,11 +278,11 @@ end
 local ASSEMBLER_META = {}
 ASSEMBLER_META.__index = ASSEMBLER_META
 
-function ASSEMBLER_META:init()
-	self.Objects = {}
-	self.Labels = {}
+function ASSEMBLER_META:init()	
 	initRegisters(self)
 	initInstructions(self)
+	initMemoryOperands(self)
+	self:clear()
 end
 
 function ASSEMBLER_META:createLabel(name)
@@ -167,13 +309,6 @@ function ASSEMBLER_META:bindLabel(label)
 		id = label.id
 	}
 	table.insert(self.Objects, obj)
-end
-
-local function fixupOperand(op)
-	if op ~= nil and type(op) == "number" then
-		op = makeOperandImm(op)
-	end
-	return op
 end
 
 function ASSEMBLER_META:emit(mnemonicId, op1, op2, op3, op4, subId)
@@ -215,7 +350,7 @@ local function encodeOperandLabel(a, base, fixups, idx, data, op)
 	return res
 end
 
-local function encodeOperandMemory(a, fixups, idx, data, op)
+local function encodeOperandMemory(a, base, fixups, idx, data, op)
 	local res = ""
 	
 	-- Decoration
@@ -229,32 +364,35 @@ local function encodeOperandMemory(a, fixups, idx, data, op)
 		res = "qword ptr ["
 	end
 	
+	printtable(op)
+	
 	local continued = false
+	local ref = op.ref
 	-- Registers
-	if op.base ~= nil then
-		res = res .. encodeOperandRegister(a, base, fixups, idx, data, op.base)
+	if ref.base ~= nil then
+		res = res .. encodeOperandRegister(a, base, fixups, idx, data, ref.base)
 		continued = true
 	end
-	if op.index ~= nil then
+	if ref.index ~= nil then
 		if continued then res = res .. "+" end
-		res = res .. encodeOperandRegister(a, base, fixups, idx, data, op.index)
+		res = res .. encodeOperandRegister(a, base, fixups, idx, data, ref.index)
 		continued = true
 	end
-	if op.scale ~= nil and op.scale ~= 1 then
+	if ref.scale ~= nil and ref.scale ~= 1 then
 		if continued then res = res .. "*" end
-		res = res .. tostring(op.scale)
+		res = res .. tostring(ref.scale)
 		continued = true
 	end
 	
 	-- Disp
-	if op.disp32 ~= nil then
+	if ref.disp32 ~= nil then
 		if continued then res = res .. "+" end
 	end
 	
 	-- Label
-	if op.label ~= nil then
+	if ref.label ~= nil then
 		if continued then res = res .. "+" end
-		res = res .. encodeOperandLabel(a, base, fixups, idx, data, op.label)
+		res = res .. encodeOperandLabel(a, base, fixups, idx, data, ref.label)
 	end
 	
 	res = res .. "]"

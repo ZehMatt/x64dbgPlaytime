@@ -1,3 +1,16 @@
+function printhexdump(buf)
+	for i=1,math.ceil(#buf/16) * 16 do
+		if (i-1) % 16 == 0 then l = l .. string.format("%08X  ", i-1) end
+		l = l .. ( i > #buf and "   " or string.format("%02X ", buf:byte(i)) )
+		if i %  8 == 0 then l = l .. " " end
+		if i % 16 == 0 then l = l .. buf:sub(i-16+1, i):gsub("%c",".") .. "\n" end
+	end
+	if l:sub(-1, -1) == "\n" then
+		l = l:sub(1, #l - 1)
+	end
+	print(l)
+end
+
 function printtable(node)
     -- to make output beautiful
     local function tab(amt)

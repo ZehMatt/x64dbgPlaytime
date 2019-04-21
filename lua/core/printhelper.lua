@@ -1,4 +1,5 @@
 function printhexdump(buf)
+	local l = ""
 	for i=1,math.ceil(#buf/16) * 16 do
 		if (i-1) % 16 == 0 then l = l .. string.format("%08X  ", i-1) end
 		l = l .. ( i > #buf and "   " or string.format("%02X ", buf:byte(i)) )

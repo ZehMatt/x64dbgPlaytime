@@ -76,7 +76,7 @@ void plugin_menu_load_lua_file()
 
     if (GetOpenFileName(&ofn) == TRUE)
     {
-        g_pLuaContext->runString(ofn.lpstrFile);
+        g_pLuaContext->runFile(ofn.lpstrFile);
     }
 }
 

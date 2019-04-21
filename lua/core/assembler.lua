@@ -304,22 +304,23 @@ function ASSEMBLER_META:make(base, dumpOutput)
 	local buffers = {}
 	local dumps = {}
 	local fixups = {}
+	local addresses = {}
 	local currentOffset = 0
 	
 	for idx, data in pairs(self.Objects) do
 		if data.object == assembler.OBJECT_INSTRUCTION then
 			local res = encodeInstruction(self, base + currentOffset, fixups, idx, data)
-			currentOffset = currentOffset + #res.data
 			table.insert(buffers, res.data)
 			if dumpOutput == true then
-				table.insert(dumps, res.readable)
+				table.insert(dumps, { address = base + currentOffset, text = res.readable })
 			end
+			currentOffset = currentOffset + #res.data
 		elseif data.object == assembler.OBJECT_LABEL then
 			local labelData = self.Labels[data.id]
 			labelData.address = base + currentOffset
 			table.insert(buffers, "") -- Need to keep it aligned, 0 buffer.
 			if dumpOutput == true then
-				table.insert(dumps, labelData.name .. ":")
+				table.insert(dumps, { address = labelData.address, text = labelData.name .. ":" })
 			end
 		end
 	end
@@ -330,13 +331,13 @@ function ASSEMBLER_META:make(base, dumpOutput)
 		local res = encodeInstruction(self, base + currentOffset, fixups, idx, self.Objects[fixup])
 		buffers[fixup] = res.data
 		if dumpOutput == true then
-			dumps[fixup] = res.readable
+			dumps[fixup].text = res.readable
 		end
 	end
 	
 	if dumpOutput == true then
 		for _,v in pairs(dumps) do
-			print(v)
+			print(string.format("%016x", v.address), v.text)
 		end
 	end
 	

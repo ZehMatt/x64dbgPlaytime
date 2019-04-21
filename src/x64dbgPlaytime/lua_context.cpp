@@ -45,6 +45,7 @@ bool LuaContext::openLibraries(bool debugState)
     extern bool luaopen_xrefs(lua_State *L, bool debugState);
     extern bool luaopen_bps(lua_State *L, bool debugState);
     extern bool luaopen_globals(lua_State *L, bool debugState);
+    extern bool luaopen_assembler(lua_State *L, bool debugState);
 
     luaopen_debugger(_globalState, debugState);
     luaopen_constants(_globalState, debugState);
@@ -57,6 +58,7 @@ bool LuaContext::openLibraries(bool debugState)
     luaopen_xrefs(_globalState, debugState);
     luaopen_bps(_globalState, debugState);
     luaopen_globals(_globalState, debugState);
+    luaopen_assembler(_globalState, debugState);
 
     return true;
 }

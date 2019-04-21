@@ -396,5 +396,8 @@
     <ClCompile Include="lua_globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lua_assembler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

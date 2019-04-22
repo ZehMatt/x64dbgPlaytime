@@ -1,5 +1,8 @@
 include("assembler_defs.lua")
 
+local printVerbose = function() end
+local printtableVerbose = function() end
+
 local function makeMemoryReference()
 
 	local REF_META = {}
@@ -10,7 +13,7 @@ local function makeMemoryReference()
 		return res
 	end
 	function REF_META:__add(other)
-		print(self, "REF_META:ADD", other)
+		printVerbose(self, "REF_META:ADD", other)
 		if type(other) == "number" then
 			local res = self:clone()
 			res.disp32 = other + (res.disp32 or 0)
@@ -37,7 +40,7 @@ local function makeMemoryReference()
 		end
 	end
 	function REF_META:__mul(other)
-		print(self, "REF_META:MUL", other)
+		printVerbose(self, "REF_META:MUL", other)
 		if type(other) == "number" then
 			local res = self:clone()
 			res.scale = other
@@ -57,7 +60,7 @@ local function makeOperandRegister(name, id, size)
 	local REG_META = {}
 	REG_META.__index = REG_META
 	function REG_META:__add(other)
-		print(self, "REG_META:ADD", other)
+		printVerbose(self, "REG_META:ADD", other)
 		local res = makeMemoryReference()
 		if type(other) == "number" then
 			res.base = self
@@ -72,7 +75,7 @@ local function makeOperandRegister(name, id, size)
 		return res
 	end
 	function REG_META:__mul(other)
-		print(self, "REG_META:MUL", other)
+		printVerbose(self, "REG_META:MUL", other)
 		local res = makeMemoryReference()
 		if type(other) == "number" then
 			res.index = self
@@ -142,11 +145,11 @@ local function initMemoryOperands(a)
 		if type(arg) == "table" and arg.object == assembler.OP_MEMORYREF then
 			ref = arg
 		elseif type(arg) == "table" and arg.object == assembler.OP_REGISTER then
-			print("reference from register")
+			printVerbose("reference from register")
 			ref = makeMemoryReference()
 			ref.base = arg
 		elseif type(arg) == "table" and arg.object == assembler.OP_LABEL then
-			print("reference from label")
+			printVerbose("reference from label")
 			ref = makeMemoryReference()
 			ref.label = arg
 		elseif type(arg) == "number" then
@@ -341,10 +344,10 @@ local function encodeOperandLabel(a, base, fixups, idx, data, op)
 	local res
 	local labelData = a.Labels[op.id]
 	if labelData.address ~= -1 then
-		res = string.format("%08X", labelData.address)
+		res = string.format("0x%X", labelData.address)
 	else
 		-- Temporary.
-		res = "0x123456"
+		res = "0x12345678"
 		table.insert(fixups, idx)
 	end
 	return res
@@ -364,7 +367,7 @@ local function encodeOperandMemory(a, base, fixups, idx, data, op)
 		res = "qword ptr ["
 	end
 	
-	printtable(op)
+	printtableVerbose(op)
 	
 	local continued = false
 	local ref = op.ref
@@ -431,6 +434,7 @@ local function encodeInstruction(a, base, fixups, idx, data)
 		instrStr = instrStr .. ", " .. encodeOperand(a, fixups, idx, data, data.op4)
 	end
 
+	printVerbose("Encode: " .. instrStr)
 	local data = assembler.encode(base, instrStr)
 	
 	return { data = data, readable = instrStr }
@@ -441,41 +445,85 @@ function ASSEMBLER_META:make(base, dumpOutput)
 	
 	local buffers = {}
 	local dumps = {}
-	local fixups = {}
 	local addresses = {}
 	local currentOffset = 0
 	
-	for idx, data in pairs(self.Objects) do
+	local function processObject(address, idx, data, fixups)
+		
+		local objectSize = 0
+		
 		if data.object == assembler.OBJECT_INSTRUCTION then
-			local res = encodeInstruction(self, base + currentOffset, fixups, idx, data)
-			table.insert(buffers, res.data)
+			local res = encodeInstruction(self, address, fixups, idx, data)
+			buffers[idx] = res.data
 			if dumpOutput == true then
-				table.insert(dumps, { address = base + currentOffset, text = res.readable })
+				dumps[idx] = { address = address, text = res.readable }
 			end
-			currentOffset = currentOffset + #res.data
+			objectSize = #res.data
 		elseif data.object == assembler.OBJECT_LABEL then
 			local labelData = self.Labels[data.id]
-			labelData.address = base + currentOffset
-			table.insert(buffers, "") -- Need to keep it aligned, 0 buffer.
+			labelData.address = address
+			buffers[idx] = "" -- Need to keep it aligned, 0/empty buffer.
 			if dumpOutput == true then
-				table.insert(dumps, { address = labelData.address, text = labelData.name .. ":" })
+				dumps[idx] = { address = labelData.address, text = labelData.name .. ":" }
 			end
 		end
+		
+		return objectSize
+
+	end
+	
+	local fixups = {}
+	for idx, data in pairs(self.Objects) do
+		local address = base + currentOffset
+		local objSize = processObject(address, idx, data, fixups)
+		addresses[idx] = address
+		currentOffset = currentOffset + objSize
 	end
 	
 	-- Every label should be bound now, creating fixups.
 	for _, fixup in pairs(fixups) do
-		-- Update buffer.
-		local res = encodeInstruction(self, base + currentOffset, fixups, idx, self.Objects[fixup])
-		buffers[fixup] = res.data
-		if dumpOutput == true then
-			dumps[fixup].text = res.readable
+		-- Update buffer.		
+		-- Invalidate everything down if required.
+		local address = addresses[fixup]
+		local tempFixups = {}
+		for idx = fixup, #self.Objects do
+			local prevSize = #buffers[idx]
+			local data = self.Objects[idx]
+			local objSize = processObject(address, idx, data, tempFixups)
+			addresses[idx] = address
+			address = address + objSize
+			if idx == fixup and prevSize == objSize then
+				-- If no shift happens we can break out of this fixup entry.
+				-- otherwise we need to invalidate all data down.
+				printVerbose("Fixup applied without invalidation, early break out")
+				break
+			elseif idx == fixup and prevSize ~= objSize then
+				-- Size changed.
+				printVerbose("Size change at " .. tostring(idx))
+				-- Need to fixup size change for bound labels
+				table.insert(fixups, idx)
+			end
 		end
 	end
 	
+	local function tohex(buf)
+		local l = ""
+		for i = 1, #buf do
+			l = l .. string.format("%02X ", buf:byte(i))
+		end
+		return l
+	end
+
 	if dumpOutput == true then
-		for _,v in pairs(dumps) do
-			print(string.format("%016x", v.address), v.text)
+		for k,v in pairs(dumps) do
+			local data = buffers[k]
+			if #data > 0 then
+				data = tohex(buffers[k])
+				for i = #data, 30 do
+					data = data .. " "
+				end
+			end
+			print(string.format("%016x", v.address), data, v.text)
 		end
 	end
 	

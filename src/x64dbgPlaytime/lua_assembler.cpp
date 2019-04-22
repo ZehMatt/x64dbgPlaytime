@@ -17,13 +17,15 @@ static int lua_assembler_encode(lua_State *L)
     if (Script::Assembler::AssembleEx(addr, dest, &outputSize, instr, error))
     {
         lua_pushlstring(L, (const char*)dest, outputSize);
+        lua_pushnil(L);
     }
     else
     {
-        luaL_error(L, "%s", error);
+        lua_pushnil(L);
+        lua_pushstring(L, error);
     }
 
-    return 1;
+    return 2;
 }
 
 static const luaL_Reg lua_assembler[] =

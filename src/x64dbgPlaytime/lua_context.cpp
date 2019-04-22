@@ -59,6 +59,7 @@ bool LuaContext::openLibraries(bool debugState)
     luaopen_bps(_globalState, debugState);
     luaopen_globals(_globalState, debugState);
     luaopen_assembler(_globalState, debugState);
+    loadCoreScripts();
 
     return true;
 }

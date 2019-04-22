@@ -356,7 +356,8 @@ local function encodeOperandLabel(a, base, fixups, idx, data, op)
 		res = string.format("0x%X", labelData.address)
 	else
 		-- Temporary.
-		res = "0x12345678"
+		-- XEDParse has issues having arbitary values here.
+		res = string.format("0x%X", base)
 		table.insert(fixups, idx)
 	end
 	return res
@@ -411,7 +412,7 @@ local function encodeOperandMemory(a, base, fixups, idx, data, op)
 	return res
 end
 
-local function encodeOperand(a, fixups, idx, data, op)
+local function encodeOperand(a, base, fixups, idx, data, op)
 	if op.object == assembler.OP_REGISTER then
 		return encodeOperandRegister(a, base, fixups, idc, data, op)
 	elseif op.object == assembler.OP_IMM then
@@ -431,16 +432,16 @@ local function encodeInstruction(a, base, fixups, idx, data)
 	local instrStr = mnemonic
 	
 	if data.op1 ~= nil then
-		instrStr = instrStr .. " " .. encodeOperand(a, fixups, idx, data, data.op1)
+		instrStr = instrStr .. " " .. encodeOperand(a, base, fixups, idx, data, data.op1)
 	end
 	if data.op2 ~= nil then
-		instrStr = instrStr .. ", " .. encodeOperand(a, fixups, idx, data, data.op2)
+		instrStr = instrStr .. ", " .. encodeOperand(a, base, fixups, idx, data, data.op2)
 	end
 	if data.op3 ~= nil then
-		instrStr = instrStr .. ", " .. encodeOperand(a, fixups, idx, data, data.op3)
+		instrStr = instrStr .. ", " .. encodeOperand(a, base, fixups, idx, data, data.op3)
 	end
 	if data.op4 ~= nil then
-		instrStr = instrStr .. ", " .. encodeOperand(a, fixups, idx, data, data.op4)
+		instrStr = instrStr .. ", " .. encodeOperand(a, base, fixups, idx, data, data.op4)
 	end
 
 	printVerbose("Encode: " .. instrStr)

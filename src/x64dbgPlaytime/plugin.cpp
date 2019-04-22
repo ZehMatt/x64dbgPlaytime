@@ -148,11 +148,6 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
         dprintf("Registered lua libraries.\n");
     }
 
-    if (!g_pLuaContext->loadCoreScripts())
-    {
-        dprintf("Unable to load core scripts, lua scripts may not function properly.\n");
-    }
-
     if (!g_pLuaContext->executeAutorunScripts())
     {
         dprintf("One ore multiple scripts failed.\n");

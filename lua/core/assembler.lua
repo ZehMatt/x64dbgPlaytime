@@ -294,7 +294,7 @@ function ASSEMBLER_META:createLabel(name)
 		id = id,
 		name = name,
 		index = -1,
-		address = -1,
+		address = nil,
 	}
 	table.insert(self.Labels, label)
 	return makeOperandLabel(id)
@@ -314,6 +314,15 @@ function ASSEMBLER_META:bindLabel(label)
 	table.insert(self.Objects, obj)
 end
 
+function ASSEMBLER_META:getLabelAddress(label)
+	local labelData = self.Labels[label.id]
+	if labelData == nil then
+		error("Label not created within assembler")
+		return
+	end
+	return labelData.address
+end
+
 function ASSEMBLER_META:emit(mnemonicId, op1, op2, op3, op4, subId)
 	op1 = fixupOperand(op1)
 	op2 = fixupOperand(op2)
@@ -327,7 +336,7 @@ function ASSEMBLER_META:emit(mnemonicId, op1, op2, op3, op4, subId)
 		op2 = op2,
 		op3 = op3,
 		op4 = op4,
-		address = -1,	-- We only get an offset after encoding.
+		address = nil,	-- We only get an offset after encoding.
 	}
 	table.insert(self.Objects, instr)
 end
@@ -343,7 +352,7 @@ end
 local function encodeOperandLabel(a, base, fixups, idx, data, op)
 	local res
 	local labelData = a.Labels[op.id]
-	if labelData.address ~= -1 then
+	if labelData.address ~= nil then
 		res = string.format("0x%X", labelData.address)
 	else
 		-- Temporary.
@@ -435,7 +444,10 @@ local function encodeInstruction(a, base, fixups, idx, data)
 	end
 
 	printVerbose("Encode: " .. instrStr)
-	local data = assembler.encode(base, instrStr)
+	local data, err = assembler.encode(base, instrStr)
+	if data == nil then
+		error("Unable to encode instruction: \"" .. instrStr .. "\" , reason: " .. err)
+	end
 	
 	return { data = data, readable = instrStr }
 	
@@ -454,6 +466,7 @@ function ASSEMBLER_META:make(base, dumpOutput)
 		
 		if data.object == assembler.OBJECT_INSTRUCTION then
 			local res = encodeInstruction(self, address, fixups, idx, data)
+			data.address = address
 			buffers[idx] = res.data
 			if dumpOutput == true then
 				dumps[idx] = { address = address, text = res.readable }

@@ -4,6 +4,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{847fa3ad-8af0-417c-a838-937c5a5edff5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\socket">
+      <UniqueIdentifier>{64a30219-5056-437b-a421-01cc3c7c6344}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lapi.c">
@@ -107,6 +110,48 @@
     </ClCompile>
     <ClCompile Include="lzio.c">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\auxiliar.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\buffer.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\compat.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\except.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\inet.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\io.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\luasocket.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\mime.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\options.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\select.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\tcp.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\timeout.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\udp.c">
+      <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\wsocket.c">
+      <Filter>src\socket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

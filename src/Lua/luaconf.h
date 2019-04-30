@@ -185,9 +185,14 @@
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
 */
+#ifdef _WIN64
+#define libx "x64"
+#else
+#define libx "x32"
+#endif
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
-#define LUA_SHRDIR	"!\\..\\share\\lua\\" LUA_VDIR "\\"
+#define LUA_SHRDIR	"!\\..\\lua\\"
 #define LUA_PATH_DEFAULT  \
 		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
 		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" \
@@ -195,7 +200,7 @@
 		".\\?.lua;" ".\\?\\init.lua"
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.dll;" \
-		LUA_CDIR"..\\lib\\lua\\" LUA_VDIR "\\?.dll;" \
+		LUA_CDIR"..\\lua\\dll\\" libx "\\?.dll;" \
 		LUA_CDIR"loadall.dll;" ".\\?.dll"
 
 #else			/* }{ */

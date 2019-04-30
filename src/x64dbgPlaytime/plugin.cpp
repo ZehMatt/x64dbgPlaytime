@@ -76,7 +76,7 @@ void plugin_menu_load_lua_file()
 
     if (GetOpenFileName(&ofn) == TRUE)
     {
-        g_pLuaContext->runString(ofn.lpstrFile);
+        g_pLuaContext->runFile(ofn.lpstrFile);
     }
 }
 
@@ -146,11 +146,6 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct)
     else
     {
         dprintf("Registered lua libraries.\n");
-    }
-
-    if (!g_pLuaContext->loadCoreScripts())
-    {
-        dprintf("Unable to load core scripts, lua scripts may not function properly.\n");
     }
 
     if (!g_pLuaContext->executeAutorunScripts())

@@ -170,6 +170,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lua_assembler.cpp" />
     <ClCompile Include="lua_bootstrap.cpp" />
     <ClCompile Include="lua_bps.cpp" />
     <ClCompile Include="lua_constants.cpp" />

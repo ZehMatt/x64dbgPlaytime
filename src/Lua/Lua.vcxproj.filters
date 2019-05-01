@@ -7,6 +7,9 @@
     <Filter Include="src\socket">
       <UniqueIdentifier>{64a30219-5056-437b-a421-01cc3c7c6344}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\bit">
+      <UniqueIdentifier>{11071c71-c603-47fc-bdfb-da87cfa9c781}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lapi.c">
@@ -152,6 +155,9 @@
     </ClCompile>
     <ClCompile Include="socket\wsocket.c">
       <Filter>src\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="bit\bit.c">
+      <Filter>src\bit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

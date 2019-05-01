@@ -2,7 +2,8 @@
 *.vcxproj.user
 .vs/
 Win32/
-x64/
+/**/x64/
+!/lua/**
 Release/
 Debug/
 bin/

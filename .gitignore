@@ -1,9 +1,9 @@
 /TestingProject/x64
-/x64dbgPlaytime/*.user
-/TestingProject/*.user
+*.vcxproj.user
 .vs/
 Win32/
-x64/
+/**/x64/
+!/lua/**
 Release/
 Debug/
 bin/

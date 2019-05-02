@@ -1,0 +1,5 @@
+LIBRARY
+EXPORTS
+    luaopen_socket_core
+    luaopen_mime_core
+    luaopen_bit

@@ -7,9 +7,7 @@ LuaContext* g_pLuaContext = nullptr;
 
 LuaContext::LuaContext()
     : _globalState(nullptr),
-    _coroutine(nullptr),
-    _scriptState(LuaScriptState::IDLE),
-    _shouldResume(false)
+    _scriptState(LuaScriptState::IDLE)
 {
 }
 
@@ -207,23 +205,9 @@ bool LuaContext::protectedLuaCall(int numArgs /*= 0*/, int numReturns /*= 0*/)
     return true;
 }
 
-void LuaContext::initCoroutine()
-{
-    if (_coroutine != nullptr || _globalState == nullptr)
-    {
-        return;
-    }
-
-    _coroutine = lua_newthread(_globalState);
-}
-
 bool LuaContext::processError(int res, lua_State *L)
 {
-    bool isError;
-    if(L == _coroutine)
-        isError = (res != 0 && res != LUA_YIELD);
-    else
-        isError = (res != 0);
+    bool isError = (res != 0);
 
     if (isError)
     {
@@ -233,16 +217,8 @@ bool LuaContext::processError(int res, lua_State *L)
             dprintf("Lua Error: %s\n", pszError);
         }
 
-        if (L == _coroutine)
-        {
-            // Invalidate coroutine, no longer valid.
-            _coroutine = nullptr;
-        }
-        else
-        {
-            // Get rid of the error on stack.
-            lua_pop(L, 1);
-        }
+        // Get rid of the error on stack.
+        lua_pop(L, 1);
 
         return false;
     }

@@ -99,9 +99,6 @@
     <ClCompile Include="ltm.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="luac.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="lundump.c">
       <Filter>src</Filter>
     </ClCompile>

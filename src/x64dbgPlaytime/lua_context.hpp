@@ -27,9 +27,7 @@ class LuaContext
 {
 private:
     lua_State* _globalState;
-    lua_State* _coroutine;
     LuaScriptState _scriptState;
-    bool _shouldResume;
     std::string _basePath;
 
  public:
@@ -59,16 +57,6 @@ private:
         return _scriptState;
     }
 
-    void setShouldResumeScript()
-    {
-        _shouldResume = true;
-    }
-
-    bool shouldResumeScript()
-    {
-        return _shouldResume;
-    }
-
 private:
     static void luaDebugCallback(lua_State *L, lua_Debug *Debug)
     {
@@ -81,7 +69,6 @@ private:
     }
 
 private:
-    void initCoroutine();
     bool processError(int res, lua_State *L);
     void debugHook(lua_State *L, lua_Debug *debug);
     void panic(lua_State *L);
